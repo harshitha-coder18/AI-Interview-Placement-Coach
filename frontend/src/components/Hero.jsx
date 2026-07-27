@@ -1,8 +1,13 @@
-import { FaUserGraduate, FaCode, FaBriefcase } from "react-icons/fa";
+import {
+  FaUserGraduate,
+  FaCode,
+  FaBriefcase
+} from "react-icons/fa";
 
 function Hero({ title, description }) {
   return (
     <section className="hero">
+
       <div className="hero-left">
 
         <span className="tag">
@@ -14,26 +19,35 @@ function Hero({ title, description }) {
         <p>{description}</p>
 
         <div className="hero-buttons">
-          <button className="btn-primary">Get Started</button>
-          <button className="btn-secondary">Explore</button>
+
+          <button className="btn-primary">
+            Get Started
+          </button>
+
+          <button className="btn-secondary">
+            Explore
+          </button>
+
         </div>
+
+        {/* Statistics */}
 
         <div className="stats">
 
           <div className="stat-card">
-            <FaUserGraduate />
+            <FaUserGraduate className="stat-icon" />
             <h3>10K+</h3>
             <p>Students</p>
           </div>
 
           <div className="stat-card">
-            <FaCode />
+            <FaCode className="stat-icon" />
             <h3>500+</h3>
             <p>DSA Questions</p>
           </div>
 
           <div className="stat-card">
-            <FaBriefcase />
+            <FaBriefcase className="stat-icon" />
             <h3>95%</h3>
             <p>Placement Success</p>
           </div>
@@ -43,11 +57,14 @@ function Hero({ title, description }) {
       </div>
 
       <div className="hero-right">
+
         <img
           src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
           alt="Student"
         />
+
       </div>
+
     </section>
   );
 }
