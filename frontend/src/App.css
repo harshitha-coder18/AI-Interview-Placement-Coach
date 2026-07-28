@@ -485,3 +485,59 @@ nav ul li:hover{
     }
 
 }
+/* ================= RESUME FORM ================= */
+
+.resume-section{
+    width:100%;
+    padding:80px 8%;
+    background:#0b1128;
+    text-align:center;
+}
+
+.resume-section h2{
+    font-size:42px;
+    margin-bottom:40px;
+    color:white;
+}
+
+.resume-form{
+    max-width:600px;
+    margin:auto;
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+}
+
+.resume-form input{
+    padding:16px;
+    font-size:17px;
+    border:none;
+    outline:none;
+    border-radius:12px;
+    background:#161f38;
+    color:white;
+}
+
+.resume-form input::placeholder{
+    color:#9aa3c7;
+}
+
+.resume-form input:focus{
+    box-shadow:0 0 0 3px rgba(109,93,252,.35);
+}
+
+.resume-form button{
+    padding:16px;
+    border:none;
+    border-radius:12px;
+    background:#6d5dfc;
+    color:white;
+    font-size:18px;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.resume-form button:hover{
+    background:#5848f0;
+    transform:translateY(-3px);
+}

@@ -4,6 +4,7 @@ import "./App.css";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import SearchBar from "./components/SearchBar";
+import Resume from "./components/Resume";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -22,23 +23,28 @@ function App() {
 
   return (
     <>
+      {/* Navbar */}
       <Navbar />
 
+      {/* Hero Section */}
       <Hero
         title="Crack Your Dream Placement 🚀"
         description="Practice DSA, build an ATS-friendly resume, and prepare for coding interviews with AI-powered guidance."
       />
 
+      {/* Search Bar */}
       <SearchBar />
 
-      <section className="counter">
+      {/* Resume Builder */}
+      <Resume />
 
+      {/* Counter */}
+      <section className="counter">
         <h2>React Counter</h2>
 
         <h1>{count}</h1>
 
         <div className="counter-buttons">
-
           <button onClick={increase}>
             Increase
           </button>
@@ -50,9 +56,7 @@ function App() {
           <button onClick={reset}>
             Reset
           </button>
-
         </div>
-
       </section>
     </>
   );
