@@ -5,8 +5,17 @@ import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import SearchBar from "./components/SearchBar";
 import Resume from "./components/Resume";
+import ResumePreview from "./components/ResumePreview";
 
 function App() {
+
+  const [resumeData, setResumeData] = useState({
+    name: "",
+    email: "",
+    college: "",
+    skills: "",
+  });
+
   const [count, setCount] = useState(0);
 
   const increase = () => {
@@ -23,28 +32,32 @@ function App() {
 
   return (
     <>
-      {/* Navbar */}
       <Navbar />
 
-      {/* Hero Section */}
       <Hero
         title="Crack Your Dream Placement 🚀"
         description="Practice DSA, build an ATS-friendly resume, and prepare for coding interviews with AI-powered guidance."
       />
 
-      {/* Search Bar */}
       <SearchBar />
 
-      {/* Resume Builder */}
-      <Resume />
+      <Resume
+        resumeData={resumeData}
+        setResumeData={setResumeData}
+      />
 
-      {/* Counter */}
+      <ResumePreview
+        resumeData={resumeData}
+      />
+
       <section className="counter">
+
         <h2>React Counter</h2>
 
         <h1>{count}</h1>
 
         <div className="counter-buttons">
+
           <button onClick={increase}>
             Increase
           </button>
@@ -56,8 +69,11 @@ function App() {
           <button onClick={reset}>
             Reset
           </button>
+
         </div>
+
       </section>
+
     </>
   );
 }

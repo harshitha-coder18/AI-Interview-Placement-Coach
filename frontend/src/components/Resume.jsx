@@ -1,24 +1,25 @@
 import { useState } from "react";
 
-function Resume() {
+function Resume({ resumeData, setResumeData }) {
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [college, setCollege] = useState("");
-  const [skills, setSkills] = useState("");
+  const handleChange = (e) => {
+
+    const { name, value } = e.target;
+
+    setResumeData({
+      ...resumeData,
+      [name]: value,
+    });
+
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    alert(
-      `Name: ${name}
-Email: ${email}
-College: ${college}
-Skills: ${skills}`
-    );
+    alert("Resume Generated Successfully!");
   };
 
   return (
+
     <section className="resume-section">
 
       <h2>📄 Resume Builder</h2>
@@ -27,30 +28,34 @@ Skills: ${skills}`
 
         <input
           type="text"
+          name="name"
           placeholder="Enter your name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={resumeData.name}
+          onChange={handleChange}
         />
 
         <input
           type="email"
+          name="email"
           placeholder="Enter your email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={resumeData.email}
+          onChange={handleChange}
         />
 
         <input
           type="text"
+          name="college"
           placeholder="Enter your college"
-          value={college}
-          onChange={(e) => setCollege(e.target.value)}
+          value={resumeData.college}
+          onChange={handleChange}
         />
 
         <input
           type="text"
+          name="skills"
           placeholder="Enter your skills"
-          value={skills}
-          onChange={(e) => setSkills(e.target.value)}
+          value={resumeData.skills}
+          onChange={handleChange}
         />
 
         <button type="submit">
@@ -60,7 +65,9 @@ Skills: ${skills}`
       </form>
 
     </section>
+
   );
+
 }
 
 export default Resume;

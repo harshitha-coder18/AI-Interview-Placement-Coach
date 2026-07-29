@@ -541,3 +541,58 @@ nav ul li:hover{
     background:#5848f0;
     transform:translateY(-3px);
 }
+/* ================= RESUME PREVIEW ================= */
+
+.preview-section{
+    width:100%;
+    padding:80px 8%;
+    background:#070b18;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.preview-card{
+    width:500px;
+    background:#11182d;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:20px;
+    padding:40px;
+    text-align:center;
+    transition:.3s;
+}
+
+.preview-card:hover{
+    transform:translateY(-5px);
+    box-shadow:0 15px 35px rgba(109,93,252,.25);
+}
+
+.preview-section h2{
+    text-align:center;
+    margin-bottom:35px;
+    color:white;
+}
+
+.profile-circle{
+    width:110px;
+    height:110px;
+    margin:0 auto 20px;
+    border-radius:50%;
+    background:#6d5dfc;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:50px;
+}
+
+.preview-card h3{
+    font-size:30px;
+    color:white;
+    margin-bottom:20px;
+}
+
+.preview-card p{
+    color:#c7cce3;
+    margin:12px 0;
+    font-size:18px;
+}
