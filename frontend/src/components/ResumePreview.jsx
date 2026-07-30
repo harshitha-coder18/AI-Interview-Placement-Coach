@@ -1,8 +1,10 @@
+import DownloadButton from "./DownloadButton";
 function ResumePreview({ resumeData }) {
 
   return (
 
     <section className="preview-section">
+      <DownloadButton />
 
       <h2>📄 Resume Preview</h2>
 
