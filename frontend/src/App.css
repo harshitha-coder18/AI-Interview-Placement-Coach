@@ -617,3 +617,16 @@ nav ul li:hover{
     transform:translateY(-3px);
     box-shadow:0 10px 25px rgba(34,197,94,.35);
 }
+/* ================= NAVBAR LINKS ================= */
+
+nav ul li a{
+    text-decoration:none;
+    color:#d8d8d8;
+    transition:.3s;
+    font-size:17px;
+    font-weight:500;
+}
+
+nav ul li a:hover{
+    color:#7c6cff;
+}

@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 function Navbar() {
   return (
     <nav>
@@ -7,11 +9,27 @@ function Navbar() {
       </div>
 
       <ul>
-        <li>Home</li>
-        <li>DSA</li>
-        <li>Resume</li>
-        <li>Mock Interview</li>
-        <li>About</li>
+
+        <li>
+          <Link to="/">Home</Link>
+        </li>
+
+        <li>
+          <Link to="/dsa">DSA</Link>
+        </li>
+
+        <li>
+          <Link to="/">Resume</Link>
+        </li>
+
+        <li>
+          <Link to="/mock-interview">Mock Interview</Link>
+        </li>
+
+        <li>
+          <Link to="/about">About</Link>
+        </li>
+
       </ul>
 
       <div className="nav-buttons">
