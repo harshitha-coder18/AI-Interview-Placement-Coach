@@ -1,13 +1,21 @@
+import PageTitle from "../components/PageTitle";
+
 function About() {
   return (
-    <section className="page">
-      <h1>ℹ️ About</h1>
+    <>
+      <PageTitle title="About Us" />
 
-      <p>
-        AI Interview Placement Coach helps students prepare for placements with
-        DSA practice, resume building, and AI-powered mock interviews.
+      <p
+        style={{
+          textAlign: "center",
+          color: "white",
+          marginTop: "20px",
+        }}
+      >
+        AI Interview Placement Coach helps students prepare for placements
+        through DSA practice, resume building, and mock interviews.
       </p>
-    </section>
+    </>
   );
 }
 

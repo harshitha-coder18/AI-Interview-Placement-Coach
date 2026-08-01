@@ -1,33 +1,43 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 
 function Navbar() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   return (
     <nav>
 
       <div className="logo">
         🚀 AI Interview Coach
       </div>
+      <div
+     className="menu-icon"
+     onClick={() => setIsMenuOpen(!isMenuOpen)}
+  >
+    ☰
+  </div>
 
-      <ul>
+
+      <ul className={isMenuOpen ? "nav-links active" : "nav-links"}>
 
         <li>
-          <Link to="/">Home</Link>
+           <Link to="/" onClick={() => setIsMenuOpen(false)}>Home</Link>
         </li>
 
         <li>
-          <Link to="/dsa">DSA</Link>
+          <Link to="/dsa" onClick={() => setIsMenuOpen(false)}>DSA</Link>
         </li>
 
         <li>
-          <Link to="/">Resume</Link>
+          <Link to="/resume" onClick={() => setIsMenuOpen(false)}>Resume</Link>
         </li>
 
         <li>
-          <Link to="/mock-interview">Mock Interview</Link>
+          <Link to="/mock-interview" onClick={() => setIsMenuOpen(false)}>Mock Interview</Link>
         </li>
 
         <li>
-          <Link to="/about">About</Link>
+          <Link to="/about" onClick={() => setIsMenuOpen(false)}>About</Link>
         </li>
 
       </ul>
