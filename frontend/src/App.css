@@ -771,3 +771,17 @@ nav ul li a:hover{
     color:white;
     margin:40px 0;
 }
+.active-link{
+    color:#6d5dfc !important;
+    font-weight:700;
+}
+
+nav a{
+    text-decoration:none;
+    color:white;
+    transition:.3s;
+}
+
+nav a:hover{
+    color:#6d5dfc;
+}

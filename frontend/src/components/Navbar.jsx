@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useState } from "react";
 
 function Navbar() {
@@ -21,23 +21,23 @@ function Navbar() {
       <ul className={isMenuOpen ? "nav-links active" : "nav-links"}>
 
         <li>
-           <Link to="/" onClick={() => setIsMenuOpen(false)}>Home</Link>
+           <NavLink to="/" className={({ isActive }) => (isActive ? "active" : "")} onClick={() => setIsMenuOpen(false)}>Home</NavLink>
         </li>
 
         <li>
-          <Link to="/dsa" onClick={() => setIsMenuOpen(false)}>DSA</Link>
+          <NavLink to="/dsa" className={({ isActive }) => (isActive ? "active" : "")} onClick={() => setIsMenuOpen(false)}>DSA</NavLink>
         </li>
 
         <li>
-          <Link to="/resume" onClick={() => setIsMenuOpen(false)}>Resume</Link>
+          <NavLink to="/resume" className={({ isActive }) => (isActive ? "active" : "")} onClick={() => setIsMenuOpen(false)}>Resume</NavLink>
         </li>
 
         <li>
-          <Link to="/mock-interview" onClick={() => setIsMenuOpen(false)}>Mock Interview</Link>
+          <NavLink to="/mock-interview" className={({ isActive }) => (isActive ? "active" : "")} onClick={() => setIsMenuOpen(false)}>Mock Interview</NavLink>
         </li>
 
         <li>
-          <Link to="/about" onClick={() => setIsMenuOpen(false)}>About</Link>
+          <NavLink to="/about" className={({ isActive }) => (isActive ? "active" : "")} onClick={() => setIsMenuOpen(false)}>About</NavLink>
         </li>
 
       </ul>
