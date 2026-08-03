@@ -7,10 +7,11 @@ import Hero from "./components/Hero";
 import SearchBar from "./components/SearchBar";
 import Resume from "./components/Resume";
 import ResumePreview from "./components/ResumePreview";
-
+import Footer from "./components/Footer";
 import DSA from "./pages/DSA";
 import MockInterview from "./pages/MockInterview";
 import About from "./pages/About";
+import ScrollToTop from "./components/ScrollToTop";
 
 function App() {
   const [resumeData, setResumeData] = useState({
@@ -72,6 +73,8 @@ function App() {
         <Route path="/mock-interview" element={<MockInterview />} />
         <Route path="/about" element={<About />} />
       </Routes>
+      <ScrollToTop />
+       <Footer />
     </>
   );
 }
