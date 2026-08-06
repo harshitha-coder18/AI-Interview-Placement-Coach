@@ -1,9 +1,10 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from .database import Base, engine, SessionLocal
 from .models import User
 from .schemas import UserCreate
+from .auth import hash_password, verify_password
 
 Base.metadata.create_all(bind=engine)
 
@@ -30,7 +31,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     new_user = User(
         name=user.name,
         email=user.email,
-        password=user.password
+        password=hash_password(user.password)
     )
 
     db.add(new_user)
@@ -40,4 +41,20 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     return {
         "message": "User registered successfully",
         "id": new_user.id
+    }
+
+
+@app.post("/login")
+def login(user: UserCreate, db: Session = Depends(get_db)):
+    db_user = db.query(User).filter(User.email == user.email).first()
+
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if not verify_password(user.password, db_user.password):
+        raise HTTPException(status_code=401, detail="Invalid password")
+
+    return {
+        "message": "Login successful",
+        "user": db_user.name
     }
