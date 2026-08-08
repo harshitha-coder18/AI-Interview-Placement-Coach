@@ -2,19 +2,23 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from .database import Base, engine, SessionLocal
-from .models import User
-from .schemas import UserCreate
+from .models import User, Question
+from .schemas import UserCreate, QuestionCreate
 from .auth import hash_password, verify_password
 from .security import create_access_token
 from .dependencies import get_current_user
 
 
+# Create database tables
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
 
+# =========================
 # Database connection
+# =========================
+
 def get_db():
     db = SessionLocal()
 
@@ -24,7 +28,10 @@ def get_db():
         db.close()
 
 
+# =========================
 # Home
+# =========================
+
 @app.get("/")
 def home():
     return {
@@ -32,13 +39,15 @@ def home():
     }
 
 
+# =========================
 # Register
+# =========================
+
 @app.post("/register")
 def register(
     user: UserCreate,
     db: Session = Depends(get_db)
 ):
-
     new_user = User(
         name=user.name,
         email=user.email,
@@ -55,13 +64,15 @@ def register(
     }
 
 
+# =========================
 # Login
+# =========================
+
 @app.post("/login")
 def login(
     user: UserCreate,
     db: Session = Depends(get_db)
 ):
-
     db_user = db.query(User).filter(
         User.email == user.email
     ).first()
@@ -92,13 +103,68 @@ def login(
     }
 
 
+# =========================
 # Protected Profile
+# =========================
+
 @app.get("/profile")
 def profile(
-    user_id: str = Depends(get_current_user)
+    user_id: str = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
+    user = db.query(User).filter(
+        User.id == int(user_id)
+    ).first()
+
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
 
     return {
-        "message": "You accessed a protected route!",
-        "user_id": user_id
+        "name": user.name,
+        "email": user.email
     }
+
+
+# =========================
+# Create Interview Question
+# =========================
+
+@app.post("/questions")
+def create_question(
+    question: QuestionCreate,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_current_user)
+):
+    new_question = Question(
+        question=question.question,
+        category=question.category,
+        user_id=int(user_id)
+    )
+
+    db.add(new_question)
+    db.commit()
+    db.refresh(new_question)
+
+    return {
+        "message": "Question created successfully",
+        "id": new_question.id
+    }
+
+
+# =========================
+# Get Interview Questions
+# =========================
+
+@app.get("/questions")
+def get_questions(
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_current_user)
+):
+    questions = db.query(Question).filter(
+        Question.user_id == int(user_id)
+    ).all()
+
+    return questions

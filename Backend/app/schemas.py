@@ -5,3 +5,7 @@ class UserCreate(BaseModel):
     name: str
     email: str
     password: str
+
+class QuestionCreate(BaseModel):
+    question: str
+    category: str
