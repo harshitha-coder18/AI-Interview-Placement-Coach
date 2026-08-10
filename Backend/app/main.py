@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from .database import Base, engine, SessionLocal
@@ -9,15 +10,34 @@ from .security import create_access_token
 from .dependencies import get_current_user
 
 
+# ============================================
 # Create database tables
+# ============================================
+
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
 
-# =========================
+# ============================================
+# CORS
+# ============================================
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+# ============================================
 # Database connection
-# =========================
+# ============================================
 
 def get_db():
     db = SessionLocal()
@@ -28,9 +48,9 @@ def get_db():
         db.close()
 
 
-# =========================
+# ============================================
 # Home
-# =========================
+# ============================================
 
 @app.get("/")
 def home():
@@ -39,15 +59,26 @@ def home():
     }
 
 
-# =========================
+# ============================================
 # Register
-# =========================
+# ============================================
 
 @app.post("/register")
 def register(
     user: UserCreate,
     db: Session = Depends(get_db)
 ):
+    # Check if email already exists
+    existing_user = db.query(User).filter(
+        User.email == user.email
+    ).first()
+
+    if existing_user:
+        raise HTTPException(
+            status_code=400,
+            detail="Email already registered"
+        )
+
     new_user = User(
         name=user.name,
         email=user.email,
@@ -64,9 +95,9 @@ def register(
     }
 
 
-# =========================
+# ============================================
 # Login
-# =========================
+# ============================================
 
 @app.post("/login")
 def login(
@@ -93,7 +124,9 @@ def login(
         )
 
     access_token = create_access_token(
-        data={"sub": str(db_user.id)}
+        data={
+            "sub": str(db_user.id)
+        }
     )
 
     return {
@@ -103,9 +136,9 @@ def login(
     }
 
 
-# =========================
+# ============================================
 # Protected Profile
-# =========================
+# ============================================
 
 @app.get("/profile")
 def profile(
@@ -128,9 +161,9 @@ def profile(
     }
 
 
-# =========================
+# ============================================
 # Create Interview Question
-# =========================
+# ============================================
 
 @app.post("/questions")
 def create_question(
@@ -154,9 +187,9 @@ def create_question(
     }
 
 
-# =========================
+# ============================================
 # Get Interview Questions
-# =========================
+# ============================================
 
 @app.get("/questions")
 def get_questions(
@@ -168,6 +201,12 @@ def get_questions(
     ).all()
 
     return questions
+
+
+# ============================================
+# Delete Question
+# ============================================
+
 @app.delete("/questions/{question_id}")
 def delete_question(
     question_id: int,
@@ -191,6 +230,12 @@ def delete_question(
     return {
         "message": "Question deleted successfully"
     }
+
+
+# ============================================
+# Update Question
+# ============================================
+
 @app.put("/questions/{question_id}")
 def update_question(
     question_id: int,
@@ -219,12 +264,19 @@ def update_question(
         "message": "Question updated successfully",
         "id": existing_question.id
     }
+
+
+# ============================================
+# Create Answer
+# ============================================
+
 @app.post("/answers")
 def create_answer(
     answer: AnswerCreate,
     db: Session = Depends(get_db),
     user_id: str = Depends(get_current_user)
 ):
+    # Make sure question belongs to logged-in user
     question = db.query(Question).filter(
         Question.id == answer.question_id,
         Question.user_id == int(user_id)
@@ -250,6 +302,12 @@ def create_answer(
         "message": "Answer submitted successfully",
         "id": new_answer.id
     }
+
+
+# ============================================
+# Get Answers
+# ============================================
+
 @app.get("/answers")
 def get_answers(
     db: Session = Depends(get_db),
@@ -259,4 +317,110 @@ def get_answers(
         Answer.user_id == int(user_id)
     ).all()
 
+    result = []
+
+    for answer in answers:
+        result.append({
+            "id": answer.id,
+            "question": answer.question.question,
+            "category": answer.question.category,
+            "answer": answer.answer
+        })
+
+    return result
+
+
+# ============================================
+# Get Answers for Specific Question
+# ============================================
+
+@app.get("/questions/{question_id}/answers")
+def get_question_answers(
+    question_id: int,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_current_user)
+):
+    question = db.query(Question).filter(
+        Question.id == question_id,
+        Question.user_id == int(user_id)
+    ).first()
+
+    if not question:
+        raise HTTPException(
+            status_code=404,
+            detail="Question not found"
+        )
+
+    answers = db.query(Answer).filter(
+        Answer.question_id == question_id,
+        Answer.user_id == int(user_id)
+    ).all()
+
     return answers
+
+
+# ============================================
+# Dashboard
+# ============================================
+
+@app.get("/dashboard")
+def dashboard(
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_current_user)
+):
+    # Get logged-in user
+    user = db.query(User).filter(
+        User.id == int(user_id)
+    ).first()
+
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
+    # Get user's questions
+    questions = db.query(Question).filter(
+        Question.user_id == int(user_id)
+    ).all()
+
+    total_questions = len(questions)
+
+    # Count user's answers
+    total_answers = db.query(Answer).filter(
+        Answer.user_id == int(user_id)
+    ).count()
+
+    # Get unique categories
+    categories = list(set(
+        question.category
+        for question in questions
+    ))
+
+    # Get 5 most recent questions
+    recent_questions = (
+        db.query(Question)
+        .filter(
+            Question.user_id == int(user_id)
+        )
+        .order_by(
+            Question.id.desc()
+        )
+        .limit(5)
+        .all()
+    )
+
+    return {
+        "name": user.name,
+        "total_questions": total_questions,
+        "total_answers": total_answers,
+        "categories": categories,
+        "recent_questions": [
+            {
+                "id": question.id,
+                "question": question.question,
+                "category": question.category
+            }
+            for question in recent_questions
+        ]
+    }

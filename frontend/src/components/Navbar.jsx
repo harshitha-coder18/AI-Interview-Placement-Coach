@@ -4,53 +4,93 @@ import { useState } from "react";
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  return (
-    <nav>
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+  };
 
+  return (
+    <nav className="navbar">
+
+      {/* Logo */}
       <div className="logo">
         🚀 AI Interview Coach
       </div>
+
+      {/* Mobile menu button */}
       <div
-     className="menu-icon"
-     onClick={() => setIsMenuOpen(!isMenuOpen)}
-  >
-    ☰
-  </div>
+        className="menu-icon"
+        onClick={() => setIsMenuOpen(!isMenuOpen)}
+      >
+        ☰
+      </div>
 
-
-      <ul className={isMenuOpen ? "nav-links active" : "nav-links"}>
+      {/* Navigation links */}
+      <ul
+        className={
+          isMenuOpen
+            ? "nav-links active"
+            : "nav-links"
+        }
+      >
 
         <li>
-           <NavLink to="/" className={({ isActive }) => (isActive ? "active" : "")} onClick={() => setIsMenuOpen(false)}>Home</NavLink>
+          <NavLink to="/" onClick={closeMenu}>
+            Home
+          </NavLink>
         </li>
 
         <li>
-          <NavLink to="/dsa" className={({ isActive }) => (isActive ? "active" : "")} onClick={() => setIsMenuOpen(false)}>DSA</NavLink>
+          <NavLink to="/dsa" onClick={closeMenu}>
+            DSA
+          </NavLink>
         </li>
 
         <li>
-          <NavLink to="/resume" className={({ isActive }) => (isActive ? "active" : "")} onClick={() => setIsMenuOpen(false)}>Resume</NavLink>
+          <NavLink to="/resume" onClick={closeMenu}>
+            Resume
+          </NavLink>
         </li>
 
         <li>
-          <NavLink to="/mock-interview" className={({ isActive }) => (isActive ? "active" : "")} onClick={() => setIsMenuOpen(false)}>Mock Interview</NavLink>
+          <NavLink
+            to="/mock-interview"
+            onClick={closeMenu}
+          >
+            Mock Interview
+          </NavLink>
         </li>
 
         <li>
-          <NavLink to="/about" className={({ isActive }) => (isActive ? "active" : "")} onClick={() => setIsMenuOpen(false)}>About</NavLink>
+          <NavLink to="/about" onClick={closeMenu}>
+            About
+          </NavLink>
+        </li>
+
+        <li>
+          <NavLink
+            to="/dashboard"
+            onClick={closeMenu}
+          >
+            Dashboard
+          </NavLink>
         </li>
 
       </ul>
 
+      {/* Buttons */}
       <div className="nav-buttons">
 
-        <button className="login-btn">
-          Login
-        </button>
+        <NavLink to="/login">
+          <button className="login-btn">
+            Login
+          </button>
+        </NavLink>
 
-        <button className="start-btn">
-          Get Started
-        </button>
+        <NavLink to="/dashboard">
+          <button className="start-btn">
+            Get Started
+          </button>
+        </NavLink>
 
       </div>
 

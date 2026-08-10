@@ -1,6 +1,7 @@
 from fastapi import HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from jose import jwt
+from jose import jwt, JWTError
+
 
 SECRET_KEY = "mysecretkey"
 ALGORITHM = "HS256"
@@ -30,7 +31,7 @@ def get_current_user(
 
         return user_id
 
-    except Exception:
+    except JWTError:
         raise HTTPException(
             status_code=401,
             detail="Invalid or expired token"
