@@ -1,11 +1,21 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  const navigate = useNavigate();
+
   const closeMenu = () => {
     setIsMenuOpen(false);
+  };
+
+  const token = localStorage.getItem("token");
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    closeMenu();
+    navigate("/login");
   };
 
   return (
@@ -16,7 +26,7 @@ function Navbar() {
         🚀 AI Interview Coach
       </div>
 
-      {/* Mobile menu button */}
+      {/* Mobile menu */}
       <div
         className="menu-icon"
         onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -24,7 +34,7 @@ function Navbar() {
         ☰
       </div>
 
-      {/* Navigation links */}
+      {/* Navigation */}
       <ul
         className={
           isMenuOpen
@@ -80,11 +90,20 @@ function Navbar() {
       {/* Buttons */}
       <div className="nav-buttons">
 
-        <NavLink to="/login">
-          <button className="login-btn">
-            Login
+        {token ? (
+          <button
+            className="login-btn"
+            onClick={handleLogout}
+          >
+            Logout
           </button>
-        </NavLink>
+        ) : (
+          <NavLink to="/login">
+            <button className="login-btn">
+              Login
+            </button>
+          </NavLink>
+        )}
 
         <NavLink to="/dashboard">
           <button className="start-btn">
