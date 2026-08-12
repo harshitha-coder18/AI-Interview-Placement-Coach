@@ -5,10 +5,11 @@ from .database import Base
 
 
 # ============================================
-# User Model
+# USER
 # ============================================
 
 class User(Base):
+
     __tablename__ = "users"
 
     id = Column(
@@ -34,10 +35,11 @@ class User(Base):
 
 
 # ============================================
-# Question Model
+# QUESTION
 # ============================================
 
 class Question(Base):
+
     __tablename__ = "questions"
 
     id = Column(
@@ -56,22 +58,54 @@ class Question(Base):
         nullable=False
     )
 
+    # ========================================
+    # DAY 24
+    # Difficulty of this specific question
+    # ========================================
+
+    difficulty = Column(
+        String,
+        nullable=False,
+        default="Easy"
+    )
+
+    # ========================================
+    # DAY 24
+    # Status of this specific question
+    # ========================================
+
+    status = Column(
+        String,
+        nullable=False,
+        default="Not Started"
+    )
+
+    # ========================================
+    # USER
+    # ========================================
+
     user_id = Column(
         Integer,
         nullable=False
     )
 
+    # ========================================
+    # ANSWERS
+    # ========================================
+
     answers = relationship(
         "Answer",
-        back_populates="question"
+        back_populates="question",
+        cascade="all, delete-orphan"
     )
 
 
 # ============================================
-# Answer Model
+# ANSWER
 # ============================================
 
 class Answer(Base):
+
     __tablename__ = "answers"
 
     id = Column(
@@ -87,7 +121,10 @@ class Answer(Base):
 
     question_id = Column(
         Integer,
-        ForeignKey("questions.id"),
+        ForeignKey(
+            "questions.id",
+            ondelete="CASCADE"
+        ),
         nullable=False
     )
 

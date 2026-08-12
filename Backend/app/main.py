@@ -11,7 +11,7 @@ from .dependencies import get_current_user
 
 
 # ============================================
-# Create database tables
+# CREATE DATABASE TABLES
 # ============================================
 
 Base.metadata.create_all(bind=engine)
@@ -36,7 +36,7 @@ app.add_middleware(
 
 
 # ============================================
-# Database connection
+# DATABASE CONNECTION
 # ============================================
 
 def get_db():
@@ -49,7 +49,7 @@ def get_db():
 
 
 # ============================================
-# Home
+# HOME
 # ============================================
 
 @app.get("/")
@@ -60,7 +60,7 @@ def home():
 
 
 # ============================================
-# Register
+# REGISTER
 # ============================================
 
 @app.post("/register")
@@ -68,7 +68,7 @@ def register(
     user: UserCreate,
     db: Session = Depends(get_db)
 ):
-    # Check if email already exists
+
     existing_user = db.query(User).filter(
         User.email == user.email
     ).first()
@@ -96,7 +96,7 @@ def register(
 
 
 # ============================================
-# Login
+# LOGIN
 # ============================================
 
 @app.post("/login")
@@ -104,6 +104,7 @@ def login(
     user: UserCreate,
     db: Session = Depends(get_db)
 ):
+
     db_user = db.query(User).filter(
         User.email == user.email
     ).first()
@@ -137,7 +138,7 @@ def login(
 
 
 # ============================================
-# Protected Profile
+# PROFILE
 # ============================================
 
 @app.get("/profile")
@@ -145,6 +146,7 @@ def profile(
     user_id: str = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+
     user = db.query(User).filter(
         User.id == int(user_id)
     ).first()
@@ -162,7 +164,7 @@ def profile(
 
 
 # ============================================
-# Create Interview Question
+# CREATE QUESTION
 # ============================================
 
 @app.post("/questions")
@@ -171,9 +173,12 @@ def create_question(
     db: Session = Depends(get_db),
     user_id: str = Depends(get_current_user)
 ):
+
     new_question = Question(
         question=question.question,
         category=question.category,
+        difficulty=question.difficulty,
+        status=question.status,
         user_id=int(user_id)
     )
 
@@ -182,13 +187,17 @@ def create_question(
     db.refresh(new_question)
 
     return {
-        "message": "Question created successfully",
-        "id": new_question.id
+        "id": new_question.id,
+        "question": new_question.question,
+        "category": new_question.category,
+        "difficulty": new_question.difficulty,
+        "status": new_question.status,
+        "user_id": new_question.user_id
     }
 
 
 # ============================================
-# Get Interview Questions
+# GET QUESTIONS
 # ============================================
 
 @app.get("/questions")
@@ -196,15 +205,66 @@ def get_questions(
     db: Session = Depends(get_db),
     user_id: str = Depends(get_current_user)
 ):
+
     questions = db.query(Question).filter(
         Question.user_id == int(user_id)
     ).all()
 
-    return questions
+    return [
+        {
+            "id": question.id,
+            "question": question.question,
+            "category": question.category,
+            "difficulty": question.difficulty,
+            "status": question.status,
+            "user_id": question.user_id
+        }
+        for question in questions
+    ]
 
 
 # ============================================
-# Delete Question
+# UPDATE QUESTION
+# ============================================
+
+@app.put("/questions/{question_id}")
+def update_question(
+    question_id: int,
+    question: QuestionCreate,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_current_user)
+):
+
+    existing_question = db.query(Question).filter(
+        Question.id == question_id,
+        Question.user_id == int(user_id)
+    ).first()
+
+    if not existing_question:
+        raise HTTPException(
+            status_code=404,
+            detail="Question not found"
+        )
+
+    existing_question.question = question.question
+    existing_question.category = question.category
+    existing_question.difficulty = question.difficulty
+    existing_question.status = question.status
+
+    db.commit()
+    db.refresh(existing_question)
+
+    return {
+        "id": existing_question.id,
+        "question": existing_question.question,
+        "category": existing_question.category,
+        "difficulty": existing_question.difficulty,
+        "status": existing_question.status
+    }
+
+
+# ============================================
+# DELETE QUESTION
 # ============================================
 
 @app.delete("/questions/{question_id}")
@@ -213,6 +273,7 @@ def delete_question(
     db: Session = Depends(get_db),
     user_id: str = Depends(get_current_user)
 ):
+
     question = db.query(Question).filter(
         Question.id == question_id,
         Question.user_id == int(user_id)
@@ -233,41 +294,7 @@ def delete_question(
 
 
 # ============================================
-# Update Question
-# ============================================
-
-@app.put("/questions/{question_id}")
-def update_question(
-    question_id: int,
-    question: QuestionCreate,
-    db: Session = Depends(get_db),
-    user_id: str = Depends(get_current_user)
-):
-    existing_question = db.query(Question).filter(
-        Question.id == question_id,
-        Question.user_id == int(user_id)
-    ).first()
-
-    if not existing_question:
-        raise HTTPException(
-            status_code=404,
-            detail="Question not found"
-        )
-
-    existing_question.question = question.question
-    existing_question.category = question.category
-
-    db.commit()
-    db.refresh(existing_question)
-
-    return {
-        "message": "Question updated successfully",
-        "id": existing_question.id
-    }
-
-
-# ============================================
-# Create Answer
+# CREATE ANSWER
 # ============================================
 
 @app.post("/answers")
@@ -276,7 +303,7 @@ def create_answer(
     db: Session = Depends(get_db),
     user_id: str = Depends(get_current_user)
 ):
-    # Make sure question belongs to logged-in user
+
     question = db.query(Question).filter(
         Question.id == answer.question_id,
         Question.user_id == int(user_id)
@@ -295,17 +322,22 @@ def create_answer(
     )
 
     db.add(new_answer)
+
+    # Automatically mark this question as completed
+    question.status = "Completed"
+
     db.commit()
     db.refresh(new_answer)
 
     return {
         "message": "Answer submitted successfully",
-        "id": new_answer.id
+        "id": new_answer.id,
+        "question_id": new_answer.question_id
     }
 
 
 # ============================================
-# Get Answers
+# GET ALL ANSWERS
 # ============================================
 
 @app.get("/answers")
@@ -313,6 +345,7 @@ def get_answers(
     db: Session = Depends(get_db),
     user_id: str = Depends(get_current_user)
 ):
+
     answers = db.query(Answer).filter(
         Answer.user_id == int(user_id)
     ).all()
@@ -320,10 +353,14 @@ def get_answers(
     result = []
 
     for answer in answers:
+
         result.append({
             "id": answer.id,
+            "question_id": answer.question_id,
             "question": answer.question.question,
             "category": answer.question.category,
+            "difficulty": answer.question.difficulty,
+            "status": answer.question.status,
             "answer": answer.answer
         })
 
@@ -331,7 +368,7 @@ def get_answers(
 
 
 # ============================================
-# Get Answers for Specific Question
+# GET ANSWERS FOR SPECIFIC QUESTION
 # ============================================
 
 @app.get("/questions/{question_id}/answers")
@@ -340,6 +377,7 @@ def get_question_answers(
     db: Session = Depends(get_db),
     user_id: str = Depends(get_current_user)
 ):
+
     question = db.query(Question).filter(
         Question.id == question_id,
         Question.user_id == int(user_id)
@@ -356,11 +394,18 @@ def get_question_answers(
         Answer.user_id == int(user_id)
     ).all()
 
-    return answers
+    return [
+        {
+            "id": answer.id,
+            "answer": answer.answer,
+            "question_id": answer.question_id
+        }
+        for answer in answers
+    ]
 
 
 # ============================================
-# Dashboard
+# DASHBOARD
 # ============================================
 
 @app.get("/dashboard")
@@ -368,7 +413,7 @@ def dashboard(
     db: Session = Depends(get_db),
     user_id: str = Depends(get_current_user)
 ):
-    # Get logged-in user
+
     user = db.query(User).filter(
         User.id == int(user_id)
     ).first()
@@ -379,25 +424,86 @@ def dashboard(
             detail="User not found"
         )
 
-    # Get user's questions
     questions = db.query(Question).filter(
         Question.user_id == int(user_id)
     ).all()
 
     total_questions = len(questions)
 
-    # Count user's answers
     total_answers = db.query(Answer).filter(
         Answer.user_id == int(user_id)
     ).count()
-
-    # Get unique categories
-    categories = list(set(
-        question.category
+    solved_questions = sum(
+        1
         for question in questions
-    ))
+        if question.status == "Solved"
+    )
 
-    # Get 5 most recent questions
+    in_progress_questions = sum(
+        1
+        for question in questions
+        if question.status == "In Progress"
+    )
+
+    not_started_questions = sum(
+        1
+        for question in questions
+        if question.status == "Not Started"
+        or question.status is None
+    )
+
+    # ========================================
+    # DIFFICULTY COUNTS
+    # ========================================
+
+    easy_questions = sum(
+        1
+        for question in questions
+        if question.difficulty == "Easy"
+        or question.difficulty is None
+    )
+
+    medium_questions = sum(
+        1
+        for question in questions
+        if question.difficulty == "Medium"
+    )
+
+    hard_questions = sum(
+        1
+        for question in questions
+        if question.difficulty == "Hard"
+    )
+
+    # ========================================
+    # PROGRESS PERCENTAGE
+    # ========================================
+
+    if total_questions == 0:
+
+        progress_percentage = 0
+
+    else:
+
+        progress_percentage = round(
+            (solved_questions / total_questions) * 100
+        )
+
+    # ========================================
+    # CATEGORIES
+    # ========================================
+
+    categories = list(
+        set(
+            question.category
+            for question in questions
+        )
+    )
+
+    # ========================================
+    # RECENT QUESTIONS
+    # ========================================
+
     recent_questions = (
         db.query(Question)
         .filter(
@@ -410,17 +516,50 @@ def dashboard(
         .all()
     )
 
+    # ========================================
+    # RESPONSE
+    # ========================================
+
     return {
+
         "name": user.name,
+
         "total_questions": total_questions,
+
         "total_answers": total_answers,
+
+        "solved_questions": solved_questions,
+
+        "in_progress_questions": in_progress_questions,
+
+        "not_started_questions": not_started_questions,
+
+        "easy_questions": easy_questions,
+
+        "medium_questions": medium_questions,
+
+        "hard_questions": hard_questions,
+
+        "progress_percentage": progress_percentage,
+
         "categories": categories,
+
         "recent_questions": [
+
             {
                 "id": question.id,
+
                 "question": question.question,
-                "category": question.category
+
+                "category": question.category,
+
+                "difficulty": question.difficulty
+                    or "Easy",
+
+                "status": question.status
+                    or "Not Started"
             }
+
             for question in recent_questions
         ]
     }
