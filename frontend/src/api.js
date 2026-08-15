@@ -336,66 +336,14 @@ export async function getQuestionAnswers(
 // RESUME
 // ============================================================
 
-export async function saveResume(resume, token) {
 
-    const response = await fetch(
-        `${API_URL}/resume`,
-        {
-            method: "POST",
-
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-
-            body: JSON.stringify(resume),
-        }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-
-        throw new Error(
-            data.detail || "Failed to save resume"
-        );
-
-    }
-
-    return data;
-}
 
 
 // ============================================================
 // GET RESUME
 // ============================================================
 
-export async function getResume(token) {
 
-    const response = await fetch(
-        `${API_URL}/resume`,
-        {
-            method: "GET",
-
-            headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-            },
-        }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-
-        throw new Error(
-            data.detail || "Resume not found"
-        );
-
-    }
-
-    return data;
-}
 // ============================================================
 // CREATE / UPDATE RESUME
 // ============================================================

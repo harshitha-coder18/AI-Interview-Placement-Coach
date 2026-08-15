@@ -3,25 +3,39 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from .database import Base, engine, SessionLocal
-from .models import User, Question, Answer
-from .schemas import UserCreate, QuestionCreate, AnswerCreate
+from .models import User, Question, Answer, Resume
+from .schemas import (
+    UserCreate,
+    QuestionCreate,
+    AnswerCreate,
+    ResumeCreate
+)
 from .auth import hash_password, verify_password
 from .security import create_access_token
 from .dependencies import get_current_user
 
 
-# ============================================
+# ============================================================
 # CREATE DATABASE TABLES
-# ============================================
+# ============================================================
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+
+# ============================================================
+# FASTAPI APP
+# ============================================================
+
+app = FastAPI(
+    title="AI Interview Placement Coach API",
+    description="Backend API for AI Interview Placement Coach",
+    version="1.0.0"
+)
 
 
-# ============================================
+# ============================================================
 # CORS
-# ============================================
+# ============================================================
 
 app.add_middleware(
     CORSMiddleware,
@@ -35,9 +49,9 @@ app.add_middleware(
 )
 
 
-# ============================================
+# ============================================================
 # DATABASE CONNECTION
-# ============================================
+# ============================================================
 
 def get_db():
     db = SessionLocal()
@@ -48,9 +62,9 @@ def get_db():
         db.close()
 
 
-# ============================================
+# ============================================================
 # HOME
-# ============================================
+# ============================================================
 
 @app.get("/")
 def home():
@@ -59,9 +73,9 @@ def home():
     }
 
 
-# ============================================
+# ============================================================
 # REGISTER
-# ============================================
+# ============================================================
 
 @app.post("/register")
 def register(
@@ -95,9 +109,9 @@ def register(
     }
 
 
-# ============================================
+# ============================================================
 # LOGIN
-# ============================================
+# ============================================================
 
 @app.post("/login")
 def login(
@@ -137,9 +151,9 @@ def login(
     }
 
 
-# ============================================
+# ============================================================
 # PROFILE
-# ============================================
+# ============================================================
 
 @app.get("/profile")
 def profile(
@@ -163,9 +177,9 @@ def profile(
     }
 
 
-# ============================================
+# ============================================================
 # CREATE QUESTION
-# ============================================
+# ============================================================
 
 @app.post("/questions")
 def create_question(
@@ -196,9 +210,9 @@ def create_question(
     }
 
 
-# ============================================
+# ============================================================
 # GET QUESTIONS
-# ============================================
+# ============================================================
 
 @app.get("/questions")
 def get_questions(
@@ -223,9 +237,9 @@ def get_questions(
     ]
 
 
-# ============================================
+# ============================================================
 # UPDATE QUESTION
-# ============================================
+# ============================================================
 
 @app.put("/questions/{question_id}")
 def update_question(
@@ -263,9 +277,9 @@ def update_question(
     }
 
 
-# ============================================
+# ============================================================
 # DELETE QUESTION
-# ============================================
+# ============================================================
 
 @app.delete("/questions/{question_id}")
 def delete_question(
@@ -293,9 +307,9 @@ def delete_question(
     }
 
 
-# ============================================
+# ============================================================
 # CREATE ANSWER
-# ============================================
+# ============================================================
 
 @app.post("/answers")
 def create_answer(
@@ -323,8 +337,8 @@ def create_answer(
 
     db.add(new_answer)
 
-    # Automatically mark this question as completed
-    question.status = "Completed"
+    # Answer submitted = question solved
+    question.status = "Solved"
 
     db.commit()
     db.refresh(new_answer)
@@ -336,9 +350,9 @@ def create_answer(
     }
 
 
-# ============================================
+# ============================================================
 # GET ALL ANSWERS
-# ============================================
+# ============================================================
 
 @app.get("/answers")
 def get_answers(
@@ -367,9 +381,9 @@ def get_answers(
     return result
 
 
-# ============================================
+# ============================================================
 # GET ANSWERS FOR SPECIFIC QUESTION
-# ============================================
+# ============================================================
 
 @app.get("/questions/{question_id}/answers")
 def get_question_answers(
@@ -404,15 +418,19 @@ def get_question_answers(
     ]
 
 
-# ============================================
+# ============================================================
 # DASHBOARD
-# ============================================
+# ============================================================
 
 @app.get("/dashboard")
 def dashboard(
     db: Session = Depends(get_db),
     user_id: str = Depends(get_current_user)
 ):
+
+    # --------------------------------------------------------
+    # FIND USER
+    # --------------------------------------------------------
 
     user = db.query(User).filter(
         User.id == int(user_id)
@@ -424,15 +442,32 @@ def dashboard(
             detail="User not found"
         )
 
+    # --------------------------------------------------------
+    # GET USER QUESTIONS
+    # --------------------------------------------------------
+
     questions = db.query(Question).filter(
         Question.user_id == int(user_id)
     ).all()
 
+    # --------------------------------------------------------
+    # TOTAL QUESTIONS
+    # --------------------------------------------------------
+
     total_questions = len(questions)
+
+    # --------------------------------------------------------
+    # TOTAL ANSWERS
+    # --------------------------------------------------------
 
     total_answers = db.query(Answer).filter(
         Answer.user_id == int(user_id)
     ).count()
+
+    # --------------------------------------------------------
+    # STATUS COUNTS
+    # --------------------------------------------------------
+
     solved_questions = sum(
         1
         for question in questions
@@ -452,9 +487,9 @@ def dashboard(
         or question.status is None
     )
 
-    # ========================================
+    # --------------------------------------------------------
     # DIFFICULTY COUNTS
-    # ========================================
+    # --------------------------------------------------------
 
     easy_questions = sum(
         1
@@ -475,9 +510,9 @@ def dashboard(
         if question.difficulty == "Hard"
     )
 
-    # ========================================
+    # --------------------------------------------------------
     # PROGRESS PERCENTAGE
-    # ========================================
+    # --------------------------------------------------------
 
     if total_questions == 0:
 
@@ -489,20 +524,21 @@ def dashboard(
             (solved_questions / total_questions) * 100
         )
 
-    # ========================================
+    # --------------------------------------------------------
     # CATEGORIES
-    # ========================================
+    # --------------------------------------------------------
 
     categories = list(
         set(
             question.category
             for question in questions
+            if question.category
         )
     )
 
-    # ========================================
+    # --------------------------------------------------------
     # RECENT QUESTIONS
-    # ========================================
+    # --------------------------------------------------------
 
     recent_questions = (
         db.query(Question)
@@ -516,9 +552,9 @@ def dashboard(
         .all()
     )
 
-    # ========================================
-    # RESPONSE
-    # ========================================
+    # --------------------------------------------------------
+    # FINAL DASHBOARD RESPONSE
+    # --------------------------------------------------------
 
     return {
 
@@ -562,4 +598,93 @@ def dashboard(
 
             for question in recent_questions
         ]
+    }
+
+
+# ============================================================
+# CREATE / UPDATE RESUME
+# ============================================================
+
+@app.post("/resume")
+def create_resume(
+    resume: ResumeCreate,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_current_user)
+):
+
+    # --------------------------------------------------------
+    # CHECK EXISTING RESUME
+    # --------------------------------------------------------
+
+    existing_resume = db.query(Resume).filter(
+        Resume.user_id == int(user_id)
+    ).first()
+
+    # --------------------------------------------------------
+    # UPDATE EXISTING RESUME
+    # --------------------------------------------------------
+
+    if existing_resume:
+
+        existing_resume.name = resume.name
+        existing_resume.email = resume.email
+        existing_resume.college = resume.college
+        existing_resume.skills = resume.skills
+
+        db.commit()
+        db.refresh(existing_resume)
+
+        return {
+            "message": "Resume updated successfully",
+            "id": existing_resume.id
+        }
+
+    # --------------------------------------------------------
+    # CREATE NEW RESUME
+    # --------------------------------------------------------
+
+    new_resume = Resume(
+        name=resume.name,
+        email=resume.email,
+        college=resume.college,
+        skills=resume.skills,
+        user_id=int(user_id)
+    )
+
+    db.add(new_resume)
+    db.commit()
+    db.refresh(new_resume)
+
+    return {
+        "message": "Resume created successfully",
+        "id": new_resume.id
+    }
+
+
+# ============================================================
+# GET RESUME
+# ============================================================
+
+@app.get("/resume")
+def get_resume(
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_current_user)
+):
+
+    resume = db.query(Resume).filter(
+        Resume.user_id == int(user_id)
+    ).first()
+
+    if not resume:
+        raise HTTPException(
+            status_code=404,
+            detail="Resume not found"
+        )
+
+    return {
+        "id": resume.id,
+        "name": resume.name,
+        "email": resume.email,
+        "college": resume.college,
+        "skills": resume.skills
     }

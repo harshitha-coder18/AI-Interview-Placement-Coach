@@ -36,3 +36,10 @@ class AnswerCreate(BaseModel):
 
     answer: str
     question_id: int
+
+class ResumeCreate(BaseModel):
+
+    name: str
+    email: str
+    college: str
+    skills: str
