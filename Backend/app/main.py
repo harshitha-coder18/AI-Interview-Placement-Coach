@@ -688,3 +688,148 @@ def get_resume(
         "college": resume.college,
         "skills": resume.skills
     }
+    # ============================================================
+# RESUME ATS ANALYZER
+# ============================================================
+
+@app.get("/resume/analyze")
+def analyze_resume(
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_current_user)
+):
+
+    # --------------------------------------------
+    # GET USER RESUME
+    # --------------------------------------------
+
+    resume = db.query(Resume).filter(
+        Resume.user_id == int(user_id)
+    ).first()
+
+    if not resume:
+        raise HTTPException(
+            status_code=404,
+            detail="Resume not found"
+        )
+
+    # --------------------------------------------
+    # INITIAL SCORE
+    # --------------------------------------------
+
+    score = 0
+    suggestions = []
+
+    # --------------------------------------------
+    # NAME
+    # --------------------------------------------
+
+    if resume.name and resume.name.strip():
+        score += 10
+    else:
+        suggestions.append(
+            "Add your full name."
+        )
+
+    # --------------------------------------------
+    # EMAIL
+    # --------------------------------------------
+
+    if resume.email and resume.email.strip():
+        score += 10
+    else:
+        suggestions.append(
+            "Add a professional email address."
+        )
+
+    # --------------------------------------------
+    # COLLEGE
+    # --------------------------------------------
+
+    if resume.college and resume.college.strip():
+        score += 15
+    else:
+        suggestions.append(
+            "Add your college or university."
+        )
+
+    # --------------------------------------------
+    # SKILLS
+    # --------------------------------------------
+
+    if resume.skills and resume.skills.strip():
+
+        score += 35
+
+        skills = [
+            skill.strip()
+            for skill in resume.skills.split(",")
+            if skill.strip()
+        ]
+
+        # Additional points based on number of skills
+        if len(skills) >= 5:
+            score += 20
+
+        elif len(skills) >= 3:
+            score += 10
+
+        else:
+            suggestions.append(
+                "Add more relevant technical skills."
+            )
+
+    else:
+
+        suggestions.append(
+            "Add technical skills such as Python, DSA, SQL, React, etc."
+        )
+
+    # --------------------------------------------
+    # SCORE LIMIT
+    # --------------------------------------------
+
+    if score > 100:
+        score = 100
+
+    # --------------------------------------------
+    # GENERAL SUGGESTIONS
+    # --------------------------------------------
+
+    if not suggestions:
+        suggestions.append(
+            "Your resume has good basic information."
+        )
+
+        suggestions.append(
+            "Consider adding projects and certifications."
+        )
+
+    # --------------------------------------------
+    # SCORE LEVEL
+    # --------------------------------------------
+
+    if score >= 80:
+        level = "Excellent"
+
+    elif score >= 60:
+        level = "Good"
+
+    elif score >= 40:
+        level = "Needs Improvement"
+
+    else:
+        level = "Weak"
+
+    # --------------------------------------------
+    # RESPONSE
+    # --------------------------------------------
+
+    return {
+
+        "ats_score": score,
+
+        "level": level,
+
+        "suggestions": suggestions
+
+    }

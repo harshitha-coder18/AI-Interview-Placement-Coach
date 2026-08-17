@@ -408,3 +408,33 @@ export async function getResume(token) {
 
     return data;
 }
+// ============================================================
+// ANALYZE RESUME ATS SCORE
+// ============================================================
+
+export async function analyzeResume(token) {
+
+    const response = await fetch(
+        `${API_URL}/resume/analyze`,
+        {
+            method: "GET",
+
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+        }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+
+        throw new Error(
+            data.detail || "Failed to analyze resume"
+        );
+
+    }
+
+    return data;
+}
