@@ -160,3 +160,45 @@ class Resume(Base):
         "User",
         back_populates="resume"
     )
+    # ============================================================
+# COMPANY ROADMAP MODEL
+# ============================================================
+
+class CompanyRoadmap(Base):
+    __tablename__ = "company_roadmaps"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    company_name = Column(
+        String,
+        nullable=False
+    )
+
+    skills = Column(
+        String,
+        nullable=False
+    )
+
+    dsa_topics = Column(
+        String,
+        nullable=False
+    )
+
+    core_subjects = Column(
+        String,
+        nullable=False
+    )
+
+    difficulty = Column(
+        String,
+        nullable=False
+    )
+
+    progress = Column(
+        Integer,
+        default=0
+    )

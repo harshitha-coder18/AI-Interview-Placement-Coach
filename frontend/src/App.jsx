@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "./App.css";
-
+import CompanyRoadmap from "./pages/CompanyRoadmap";
+import CompanyPreparation from "./pages/CompanyPreparation";
 import { Routes, Route } from "react-router-dom";
 
 // Components
@@ -144,6 +145,14 @@ function App() {
         <Route
           path="/dashboard"
           element={<Dashboard />}
+        />
+        <Route
+          path="/companies"
+          element={<CompanyRoadmap />}
+        />
+        <Route
+          path="/companies/:companyId"
+          element={<CompanyPreparation />}
         />
 
       </Routes>

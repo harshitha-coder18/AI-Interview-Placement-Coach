@@ -1453,3 +1453,220 @@ img{
     }
 
 }
+/* =========================================
+   DAY 30 - COMPANY ROADMAP
+========================================= */
+
+.company-roadmap-page {
+    min-height: 100vh;
+    padding: 55px 8%;
+    background: #070b18;
+    color: white;
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.company-roadmap-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.company-roadmap-header h1 {
+    font-size: 42px;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, #ffffff, #8f7bff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.company-roadmap-header p {
+    color: #aeb6d0;
+    font-size: 17px;
+}
+
+/* =========================================
+   COMPANY GRID
+========================================= */
+
+.company-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+}
+
+/* =========================================
+   COMPANY CARD
+========================================= */
+
+.company-card {
+    background: #101323;
+    border: 1px solid #252942;
+    border-radius: 20px;
+    padding: 30px;
+    transition: all 0.3s ease;
+}
+
+.company-card:hover {
+    transform: translateY(-5px);
+    border-color: #6d5dfc;
+    box-shadow: 0 15px 35px rgba(109, 93, 252, 0.18);
+}
+
+/* =========================================
+   COMPANY NAME
+========================================= */
+
+.company-card h2 {
+    font-size: 28px;
+    margin-bottom: 10px;
+    color: white;
+}
+
+.company-card > p {
+    color: #aeb6d0;
+    margin-bottom: 25px;
+}
+
+/* =========================================
+   COMPANY SECTIONS
+========================================= */
+
+.company-section {
+    margin-bottom: 22px;
+}
+
+.company-section h3 {
+    font-size: 17px;
+    margin-bottom: 7px;
+    color: #ffffff;
+}
+
+.company-section p {
+    color: #aeb6d0;
+    line-height: 1.7;
+}
+
+/* =========================================
+   PROGRESS
+========================================= */
+
+.company-progress {
+    margin-top: 25px;
+}
+
+.company-progress .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.company-progress .progress-header span {
+    color: #aeb6d0;
+}
+
+.company-progress .progress-header strong {
+    color: #9b8cff;
+}
+
+.company-progress .progress-bar {
+    width: 100%;
+    height: 10px;
+    background: #080b18;
+    border: 1px solid #252942;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.company-progress .progress-fill {
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        #6c4cff,
+        #9b7cff
+    );
+    border-radius: 20px;
+    transition: width 0.5s ease;
+}
+
+/* =========================================
+   START PREPARATION BUTTON
+========================================= */
+
+.company-card button {
+    width: 100%;
+    margin-top: 25px;
+    padding: 13px 20px;
+    border: none;
+    border-radius: 10px;
+
+    background: linear-gradient(
+        135deg,
+        #6d5dfc,
+        #8f7bff
+    );
+
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.company-card button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(109, 93, 252, 0.3);
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 900px) {
+
+    .company-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .company-roadmap-page {
+        padding: 35px 5%;
+    }
+
+    .company-roadmap-header h1 {
+        font-size: 32px;
+    }
+
+    .company-card {
+        padding: 22px;
+    }
+
+}
+.progress-controls {
+    margin-top: 25px;
+}
+
+.progress-controls label {
+    display: block;
+    margin-bottom: 12px;
+    color: #aeb6d0;
+}
+
+.progress-controls input[type="range"] {
+    width: 100%;
+    accent-color: #6d5dfc;
+    cursor: pointer;
+}
+
+.progress-controls span {
+    display: block;
+    margin-top: 8px;
+    color: #a995ff;
+    font-weight: 600;
+}

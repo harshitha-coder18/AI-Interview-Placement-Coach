@@ -38,17 +38,12 @@ function Dashboard() {
     if (error) {
         return (
             <div className="dashboard-page">
-
                 <h2>Error</h2>
-
                 <p>{error}</p>
 
-                <button
-                    onClick={() => navigate("/login")}
-                >
+                <button onClick={() => navigate("/login")}>
                     Go to Login
                 </button>
-
             </div>
         );
     }
@@ -60,11 +55,7 @@ function Dashboard() {
     if (!dashboard) {
         return (
             <div className="dashboard-page">
-
-                <h2>
-                    Loading dashboard...
-                </h2>
-
+                <h2>Loading dashboard...</h2>
             </div>
         );
     }
@@ -73,11 +64,8 @@ function Dashboard() {
     // SAFE VALUES
     // ========================================
 
-    const totalQuestions =
-        dashboard.total_questions || 0;
-
-    const totalAnswers =
-        dashboard.total_answers || 0;
+    const totalQuestions = dashboard.total_questions || 0;
+    const totalAnswers = dashboard.total_answers || 0;
 
     const solvedQuestions =
         dashboard.solved_questions || 0;
@@ -101,50 +89,36 @@ function Dashboard() {
         dashboard.progress_percentage || 0;
 
     // ========================================
-    // PERCENTAGE CALCULATIONS
+    // PERCENTAGES
     // ========================================
 
+    const calculatePercentage = (value) => {
+        if (totalQuestions === 0) {
+            return 0;
+        }
+
+        return Math.round(
+            (value / totalQuestions) * 100
+        );
+    };
+
     const solvedPercentage =
-        totalQuestions === 0
-            ? 0
-            : Math.round(
-                (solvedQuestions / totalQuestions) * 100
-            );
+        calculatePercentage(solvedQuestions);
 
     const inProgressPercentage =
-        totalQuestions === 0
-            ? 0
-            : Math.round(
-                (inProgressQuestions / totalQuestions) * 100
-            );
+        calculatePercentage(inProgressQuestions);
 
     const notStartedPercentage =
-        totalQuestions === 0
-            ? 0
-            : Math.round(
-                (notStartedQuestions / totalQuestions) * 100
-            );
+        calculatePercentage(notStartedQuestions);
 
     const easyPercentage =
-        totalQuestions === 0
-            ? 0
-            : Math.round(
-                (easyQuestions / totalQuestions) * 100
-            );
+        calculatePercentage(easyQuestions);
 
     const mediumPercentage =
-        totalQuestions === 0
-            ? 0
-            : Math.round(
-                (mediumQuestions / totalQuestions) * 100
-            );
+        calculatePercentage(mediumQuestions);
 
     const hardPercentage =
-        totalQuestions === 0
-            ? 0
-            : Math.round(
-                (hardQuestions / totalQuestions) * 100
-            );
+        calculatePercentage(hardQuestions);
 
     // ========================================
     // PAGE
@@ -230,7 +204,7 @@ function Dashboard() {
 
 
             {/* ========================================
-                OVERALL PROGRESS
+                DAY 28 - DSA PROGRESS SUMMARY
             ======================================== */}
 
             <div className="dashboard-section">
@@ -238,7 +212,7 @@ function Dashboard() {
                 <div className="section-header">
 
                     <h2>
-                        DSA Progress
+                        📊 DSA Progress Summary
                     </h2>
 
                     <button
@@ -250,20 +224,108 @@ function Dashboard() {
                 </div>
 
 
-                <div className="progress-container">
+                <div className="progress-summary-grid">
 
-                    <div className="progress-header">
+                    {/* TOTAL */}
 
-                        <span>
-                            Overall Progress
-                        </span>
+                    <div className="progress-summary-card">
 
-                        <strong>
-                            {progressPercentage}%
-                        </strong>
+                        <h3>
+                            📚 Total
+                        </h3>
+
+                        <p className="summary-number">
+                            {totalQuestions}
+                        </p>
+
+                        <p>
+                            Questions
+                        </p>
 
                     </div>
 
+
+                    {/* SOLVED */}
+
+                    <div className="progress-summary-card">
+
+                        <h3>
+                            ✅ Solved
+                        </h3>
+
+                        <p className="summary-number">
+                            {solvedQuestions}
+                        </p>
+
+                        <p>
+                            {solvedPercentage}% completed
+                        </p>
+
+                    </div>
+
+
+                    {/* IN PROGRESS */}
+
+                    <div className="progress-summary-card">
+
+                        <h3>
+                            🔄 In Progress
+                        </h3>
+
+                        <p className="summary-number">
+                            {inProgressQuestions}
+                        </p>
+
+                        <p>
+                            {inProgressPercentage}%
+                        </p>
+
+                    </div>
+
+
+                    {/* NOT STARTED */}
+
+                    <div className="progress-summary-card">
+
+                        <h3>
+                            ⏳ Not Started
+                        </h3>
+
+                        <p className="summary-number">
+                            {notStartedQuestions}
+                        </p>
+
+                        <p>
+                            {notStartedPercentage}%
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            {/* ========================================
+                OVERALL PROGRESS
+            ======================================== */}
+
+            <div className="dashboard-section">
+
+                <div className="section-header">
+
+                    <h2>
+                        🎯 Overall Progress
+                    </h2>
+
+                    <strong>
+                        {progressPercentage}%
+                    </strong>
+
+                </div>
+
+
+                <div className="progress-container">
 
                     <div className="progress-bar">
 
@@ -301,8 +363,6 @@ function Dashboard() {
                 </h2>
 
 
-                {/* SOLVED */}
-
                 <div className="analytics-row">
 
                     <div className="analytics-label">
@@ -317,7 +377,6 @@ function Dashboard() {
 
                     </div>
 
-
                     <div className="analytics-bar">
 
                         <div
@@ -330,17 +389,12 @@ function Dashboard() {
 
                     </div>
 
-
                     <span className="analytics-percentage">
-
                         {solvedPercentage}%
-
                     </span>
 
                 </div>
 
-
-                {/* IN PROGRESS */}
 
                 <div className="analytics-row">
 
@@ -356,7 +410,6 @@ function Dashboard() {
 
                     </div>
 
-
                     <div className="analytics-bar">
 
                         <div
@@ -369,17 +422,12 @@ function Dashboard() {
 
                     </div>
 
-
                     <span className="analytics-percentage">
-
                         {inProgressPercentage}%
-
                     </span>
 
                 </div>
 
-
-                {/* NOT STARTED */}
 
                 <div className="analytics-row">
 
@@ -395,7 +443,6 @@ function Dashboard() {
 
                     </div>
 
-
                     <div className="analytics-bar">
 
                         <div
@@ -408,11 +455,8 @@ function Dashboard() {
 
                     </div>
 
-
                     <span className="analytics-percentage">
-
                         {notStartedPercentage}%
-
                     </span>
 
                 </div>
@@ -427,11 +471,9 @@ function Dashboard() {
             <div className="dashboard-section">
 
                 <h2>
-                    Difficulty Breakdown
+                    🎯 Difficulty Breakdown
                 </h2>
 
-
-                {/* EASY */}
 
                 <div className="analytics-row">
 
@@ -447,7 +489,6 @@ function Dashboard() {
 
                     </div>
 
-
                     <div className="analytics-bar">
 
                         <div
@@ -460,17 +501,12 @@ function Dashboard() {
 
                     </div>
 
-
                     <span className="analytics-percentage">
-
                         {easyPercentage}%
-
                     </span>
 
                 </div>
 
-
-                {/* MEDIUM */}
 
                 <div className="analytics-row">
 
@@ -486,7 +522,6 @@ function Dashboard() {
 
                     </div>
 
-
                     <div className="analytics-bar">
 
                         <div
@@ -499,17 +534,12 @@ function Dashboard() {
 
                     </div>
 
-
                     <span className="analytics-percentage">
-
                         {mediumPercentage}%
-
                     </span>
 
                 </div>
 
-
-                {/* HARD */}
 
                 <div className="analytics-row">
 
@@ -525,11 +555,11 @@ function Dashboard() {
 
                     </div>
 
-
                     <div className="analytics-bar">
 
                         <div
                             className="analytics-fill"
+
                             style={{
                                 width:
                                     `${hardPercentage}%`,
@@ -538,11 +568,8 @@ function Dashboard() {
 
                     </div>
 
-
                     <span className="analytics-percentage">
-
                         {hardPercentage}%
-
                     </span>
 
                 </div>
@@ -557,7 +584,7 @@ function Dashboard() {
             <div className="dashboard-section">
 
                 <h2>
-                    Topics Practiced
+                    📚 Topics Practiced
                 </h2>
 
 
@@ -600,7 +627,7 @@ function Dashboard() {
                 <div className="section-header">
 
                     <h2>
-                        Recent Questions
+                        📝 Recent Questions
                     </h2>
 
                     <button
@@ -628,11 +655,9 @@ function Dashboard() {
                                         {question.question}
                                     </h3>
 
-
                                     <span>
                                         {question.category}
                                     </span>
-
 
                                     <div>
 
@@ -644,7 +669,6 @@ function Dashboard() {
                                             "Easy"}
 
                                     </div>
-
 
                                     <div>
 

@@ -3,7 +3,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from .database import Base, engine, SessionLocal
-from .models import User, Question, Answer, Resume
+from .models import (
+    User,
+    Question,
+    Answer,
+    Resume,
+    CompanyRoadmap
+)
 from .schemas import (
     UserCreate,
     QuestionCreate,
@@ -833,3 +839,138 @@ def analyze_resume(
         "suggestions": suggestions
 
     }
+    # ============================================================
+# COMPANY ROADMAP
+# ============================================================
+
+@app.get("/companies")
+def get_companies(
+    db: Session = Depends(get_db)
+):
+
+    companies = db.query(
+        CompanyRoadmap
+    ).all()
+
+    return [
+        {
+            "id": company.id,
+            "company_name": company.company_name,
+            "skills": company.skills,
+            "dsa_topics": company.dsa_topics,
+            "core_subjects": company.core_subjects,
+            "difficulty": company.difficulty,
+            "progress": company.progress
+        }
+        for company in companies
+    ]
+    # ============================================================
+# COMPANY ROADMAP - GET COMPANIES
+# ============================================================
+
+@app.get("/companies")
+def get_companies(
+    db: Session = Depends(get_db)
+):
+
+    companies = db.query(
+        CompanyRoadmap
+    ).all()
+
+    return [
+        {
+            "id": company.id,
+            "company_name": company.company_name,
+            "skills": company.skills,
+            "dsa_topics": company.dsa_topics,
+            "core_subjects": company.core_subjects,
+            "difficulty": company.difficulty,
+            "progress": company.progress
+        }
+        for company in companies
+    ]
+
+
+# ============================================================
+# COMPANY ROADMAP - SEED COMPANIES
+# ============================================================
+
+@app.post("/companies/seed")
+def seed_companies(
+    db: Session = Depends(get_db)
+):
+
+    existing = db.query(
+        CompanyRoadmap
+    ).count()
+
+    if existing > 0:
+        return {
+            "message": "Companies already exist"
+        }
+
+    companies = [
+
+        CompanyRoadmap(
+            company_name="Cisco",
+            skills="Python, C++, Networking, Linux",
+            dsa_topics="Arrays, Strings, Linked List, Trees, Graphs",
+            core_subjects="DBMS, OS, Computer Networks",
+            difficulty="Medium",
+            progress=0
+        ),
+
+        CompanyRoadmap(
+            company_name="TCS",
+            skills="C++, Java, Python, SQL",
+            dsa_topics="Arrays, Strings, Sorting, Searching",
+            core_subjects="DBMS, OS, OOP",
+            difficulty="Easy",
+            progress=0
+        ),
+
+        CompanyRoadmap(
+            company_name="Infosys",
+            skills="Java, Python, SQL",
+            dsa_topics="Arrays, Strings, Linked List, Recursion",
+            core_subjects="DBMS, OS, OOP",
+            difficulty="Easy",
+            progress=0
+        ),
+
+        CompanyRoadmap(
+            company_name="Amazon",
+            skills="Python, Java, C++, SQL",
+            dsa_topics="Arrays, Trees, Graphs, DP, Hashing",
+            core_subjects="DBMS, OS, Networking, OOP",
+            difficulty="Hard",
+            progress=0
+        ),
+
+        CompanyRoadmap(
+            company_name="Microsoft",
+            skills="C++, Java, Python, SQL",
+            dsa_topics="Arrays, Trees, Graphs, DP, Backtracking",
+            core_subjects="OS, DBMS, Networking, OOP",
+            difficulty="Hard",
+            progress=0
+        ),
+
+        CompanyRoadmap(
+            company_name="Google",
+            skills="C++, Python, Java",
+            dsa_topics="Arrays, Trees, Graphs, DP, Graph Algorithms",
+            core_subjects="OS, DBMS, Networking, System Design",
+            difficulty="Hard",
+            progress=0
+        )
+    ]
+
+    db.add_all(companies)
+
+    db.commit()
+
+    return {
+        "message": "Company roadmap created successfully"
+    }
+    
