@@ -438,3 +438,34 @@ export async function analyzeResume(token) {
 
     return data;
 }
+// ============================================================
+// UPDATE COMPANY PROGRESS
+// ============================================================
+
+export async function updateCompanyProgress(
+    companyId,
+    progress,
+    token
+) {
+    const response = await fetch(
+        `${API_URL}/companies/${companyId}/progress?progress=${progress}`,
+        {
+            method: "PUT",
+
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+        }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(
+            data.detail || "Failed to update company progress"
+        );
+    }
+
+    return data;
+}

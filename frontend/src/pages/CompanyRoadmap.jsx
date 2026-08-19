@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function CompanyRoadmap() {
-
     const [companies, setCompanies] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+
     const navigate = useNavigate();
 
     // ============================================
@@ -13,10 +13,8 @@ function CompanyRoadmap() {
     // ============================================
 
     useEffect(() => {
-
         fetch("http://127.0.0.1:8000/companies")
             .then((response) => {
-
                 if (!response.ok) {
                     throw new Error("Failed to load companies");
                 }
@@ -24,76 +22,53 @@ function CompanyRoadmap() {
                 return response.json();
             })
             .then((data) => {
-
                 console.log("Companies:", data);
 
                 setCompanies(data);
                 setLoading(false);
             })
             .catch((error) => {
-
-                console.error(
-                    "Company roadmap error:",
-                    error
-                );
+                console.error("Company roadmap error:", error);
 
                 setError(error.message);
                 setLoading(false);
             });
-
     }, []);
-
 
     // ============================================
     // LOADING
     // ============================================
 
     if (loading) {
-
         return (
             <div className="company-roadmap-page">
-
-                <h2>
-                    Loading company roadmap...
-                </h2>
-
+                <h2>Loading company roadmap...</h2>
             </div>
         );
     }
-
 
     // ============================================
     // ERROR
     // ============================================
 
     if (error) {
-
         return (
             <div className="company-roadmap-page">
+                <h2>Company Roadmap</h2>
 
-                <h2>
-                    Company Roadmap
-                </h2>
-
-                <p>
-                    {error}
-                </p>
-
+                <p>{error}</p>
             </div>
         );
     }
-
 
     // ============================================
     // PAGE
     // ============================================
 
     return (
-
         <div className="company-roadmap-page">
 
             <div className="company-roadmap-header">
-
                 <h1>
                     🚀 Company Roadmap
                 </h1>
@@ -101,13 +76,9 @@ function CompanyRoadmap() {
                 <p>
                     Prepare for your dream company step by step.
                 </p>
-
             </div>
 
-
-            {/* ========================================
-                COMPANY CARDS
-            ======================================== */}
+            {/* COMPANY CARDS */}
 
             <div className="company-grid">
 
@@ -122,7 +93,6 @@ function CompanyRoadmap() {
                             {company.company_name}
                         </h2>
 
-
                         <p>
                             <strong>
                                 Difficulty:
@@ -130,6 +100,7 @@ function CompanyRoadmap() {
                             {company.difficulty}
                         </p>
 
+                        {/* SKILLS */}
 
                         <div className="company-section">
 
@@ -143,6 +114,7 @@ function CompanyRoadmap() {
 
                         </div>
 
+                        {/* DSA */}
 
                         <div className="company-section">
 
@@ -156,6 +128,7 @@ function CompanyRoadmap() {
 
                         </div>
 
+                        {/* CORE SUBJECTS */}
 
                         <div className="company-section">
 
@@ -169,7 +142,6 @@ function CompanyRoadmap() {
 
                         </div>
 
-
                         {/* PROGRESS */}
 
                         <div className="company-progress">
@@ -181,11 +153,10 @@ function CompanyRoadmap() {
                                 </span>
 
                                 <strong>
-                                    {company.progress}%
+                                    {company.progress || 0}%
                                 </strong>
 
                             </div>
-
 
                             <div className="progress-bar">
 
@@ -193,7 +164,7 @@ function CompanyRoadmap() {
                                     className="progress-fill"
                                     style={{
                                         width:
-                                            `${company.progress}%`
+                                            `${company.progress || 0}%`
                                     }}
                                 ></div>
 
@@ -201,12 +172,13 @@ function CompanyRoadmap() {
 
                         </div>
 
+                        {/* START PREPARATION */}
 
                         <button
                             type="button"
                             onClick={() =>
                                 navigate(
-            `                         /companies/${company.id}`
+                                    `/companies/${company.id}`
                                 )
                             }
                         >

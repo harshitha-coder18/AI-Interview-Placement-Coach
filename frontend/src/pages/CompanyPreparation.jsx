@@ -6,9 +6,13 @@ function CompanyPreparation() {
     const { companyId } = useParams();
 
     const [company, setCompany] = useState(null);
+
     const [loading, setLoading] = useState(true);
+
     const [error, setError] = useState("");
+
     const [progress, setProgress] = useState(0);
+
 
     // ============================================
     // LOAD COMPANY
@@ -22,19 +26,29 @@ function CompanyPreparation() {
             .then((response) => {
 
                 if (!response.ok) {
+
                     throw new Error(
                         "Failed to load company"
                     );
+
                 }
 
                 return response.json();
+
             })
             .then((data) => {
 
-                console.log("Company:", data);
+                console.log(
+                    "Company:",
+                    data
+                );
 
                 setCompany(data);
-                setProgress(data.progress || 0);
+
+                setProgress(
+                    data.progress || 0
+                );
+
                 setLoading(false);
 
             })
@@ -45,12 +59,86 @@ function CompanyPreparation() {
                     error
                 );
 
-                setError(error.message);
+                setError(
+                    error.message
+                );
+
                 setLoading(false);
 
             });
 
     }, [companyId]);
+
+
+    // ============================================
+    // UPDATE PROGRESS
+    // ============================================
+
+    const updateProgress = async () => {
+
+        const token =
+            localStorage.getItem("token");
+
+        if (!token) {
+
+            alert(
+                "Please login first."
+            );
+
+            return;
+
+        }
+
+        try {
+
+            const response = await fetch(
+                `http://127.0.0.1:8000/companies/${companyId}/progress?progress=${progress}`,
+                {
+                    method: "PUT",
+
+                    headers: {
+                        Authorization:
+                            `Bearer ${token}`
+                    }
+                }
+            );
+
+            const data =
+                await response.json();
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.detail ||
+                    "Failed to update progress"
+                );
+
+            }
+
+            alert(
+                "Progress updated successfully!"
+            );
+
+            setCompany((previous) => ({
+                ...previous,
+                progress: data.progress
+            }));
+
+        }
+        catch (error) {
+
+            console.error(
+                "Progress update error:",
+                error
+            );
+
+            alert(
+                error.message
+            );
+
+        }
+
+    };
 
 
     // ============================================
@@ -68,6 +156,7 @@ function CompanyPreparation() {
 
             </div>
         );
+
     }
 
 
@@ -90,6 +179,7 @@ function CompanyPreparation() {
 
             </div>
         );
+
     }
 
 
@@ -161,6 +251,21 @@ function CompanyPreparation() {
             </div>
 
 
+            {/* DIFFICULTY */}
+
+            <div className="preparation-card">
+
+                <h2>
+                    🎯 Difficulty
+                </h2>
+
+                <p>
+                    {company.difficulty}
+                </p>
+
+            </div>
+
+
             {/* PROGRESS */}
 
             <div className="preparation-card">
@@ -168,7 +273,6 @@ function CompanyPreparation() {
                 <h2>
                     📊 Preparation Progress
                 </h2>
-
 
                 <div className="company-progress">
 
@@ -190,24 +294,23 @@ function CompanyPreparation() {
                         <div
                             className="progress-fill"
                             style={{
-                                width: `${progress}%`
+                                width:
+                                    `${progress}%`
                             }}
-                        >
-                        </div>
+                        ></div>
 
                     </div>
 
                 </div>
 
 
-                {/* PROGRESS CONTROLS */}
+                {/* PROGRESS CONTROL */}
 
                 <div className="progress-controls">
 
                     <label>
                         Update Preparation Progress
                     </label>
-
 
                     <input
                         type="range"
@@ -216,22 +319,32 @@ function CompanyPreparation() {
                         value={progress}
                         onChange={(e) =>
                             setProgress(
-                                Number(e.target.value)
+                                Number(
+                                    e.target.value
+                                )
                             )
                         }
                     />
 
-
                     <span>
                         {progress}%
                     </span>
+
+                    <button
+                        type="button"
+                        onClick={updateProgress}
+                    >
+                        💾 Save Progress
+                    </button>
 
                 </div>
 
             </div>
 
         </div>
+
     );
+
 }
 
 export default CompanyPreparation;
