@@ -74,6 +74,7 @@ def get_db():
 
 @app.get("/")
 def home():
+
     return {
         "message": "Welcome to AI Interview Placement Coach Backend 🚀"
     }
@@ -94,6 +95,7 @@ def register(
     ).first()
 
     if existing_user:
+
         raise HTTPException(
             status_code=400,
             detail="Email already registered"
@@ -106,7 +108,9 @@ def register(
     )
 
     db.add(new_user)
+
     db.commit()
+
     db.refresh(new_user)
 
     return {
@@ -130,6 +134,7 @@ def login(
     ).first()
 
     if not db_user:
+
         raise HTTPException(
             status_code=404,
             detail="User not found"
@@ -139,6 +144,7 @@ def login(
         user.password,
         db_user.password
     ):
+
         raise HTTPException(
             status_code=401,
             detail="Invalid password"
@@ -172,6 +178,7 @@ def profile(
     ).first()
 
     if not user:
+
         raise HTTPException(
             status_code=404,
             detail="User not found"
@@ -203,7 +210,9 @@ def create_question(
     )
 
     db.add(new_question)
+
     db.commit()
+
     db.refresh(new_question)
 
     return {
@@ -261,6 +270,7 @@ def update_question(
     ).first()
 
     if not existing_question:
+
         raise HTTPException(
             status_code=404,
             detail="Question not found"
@@ -272,6 +282,7 @@ def update_question(
     existing_question.status = question.status
 
     db.commit()
+
     db.refresh(existing_question)
 
     return {
@@ -300,12 +311,14 @@ def delete_question(
     ).first()
 
     if not question:
+
         raise HTTPException(
             status_code=404,
             detail="Question not found"
         )
 
     db.delete(question)
+
     db.commit()
 
     return {
@@ -330,6 +343,7 @@ def create_answer(
     ).first()
 
     if not question:
+
         raise HTTPException(
             status_code=404,
             detail="Question not found"
@@ -343,10 +357,10 @@ def create_answer(
 
     db.add(new_answer)
 
-    # Answer submitted = question solved
     question.status = "Solved"
 
     db.commit()
+
     db.refresh(new_answer)
 
     return {
@@ -375,13 +389,21 @@ def get_answers(
     for answer in answers:
 
         result.append({
+
             "id": answer.id,
+
             "question_id": answer.question_id,
+
             "question": answer.question.question,
+
             "category": answer.question.category,
+
             "difficulty": answer.question.difficulty,
+
             "status": answer.question.status,
+
             "answer": answer.answer
+
         })
 
     return result
@@ -404,6 +426,7 @@ def get_question_answers(
     ).first()
 
     if not question:
+
         raise HTTPException(
             status_code=404,
             detail="Question not found"
@@ -415,12 +438,15 @@ def get_question_answers(
     ).all()
 
     return [
+
         {
             "id": answer.id,
             "answer": answer.answer,
             "question_id": answer.question_id
         }
+
         for answer in answers
+
     ]
 
 
@@ -434,45 +460,26 @@ def dashboard(
     user_id: str = Depends(get_current_user)
 ):
 
-    # --------------------------------------------------------
-    # FIND USER
-    # --------------------------------------------------------
-
     user = db.query(User).filter(
         User.id == int(user_id)
     ).first()
 
     if not user:
+
         raise HTTPException(
             status_code=404,
             detail="User not found"
         )
 
-    # --------------------------------------------------------
-    # GET USER QUESTIONS
-    # --------------------------------------------------------
-
     questions = db.query(Question).filter(
         Question.user_id == int(user_id)
     ).all()
 
-    # --------------------------------------------------------
-    # TOTAL QUESTIONS
-    # --------------------------------------------------------
-
     total_questions = len(questions)
-
-    # --------------------------------------------------------
-    # TOTAL ANSWERS
-    # --------------------------------------------------------
 
     total_answers = db.query(Answer).filter(
         Answer.user_id == int(user_id)
     ).count()
-
-    # --------------------------------------------------------
-    # STATUS COUNTS
-    # --------------------------------------------------------
 
     solved_questions = sum(
         1
@@ -493,10 +500,6 @@ def dashboard(
         or question.status is None
     )
 
-    # --------------------------------------------------------
-    # DIFFICULTY COUNTS
-    # --------------------------------------------------------
-
     easy_questions = sum(
         1
         for question in questions
@@ -516,10 +519,6 @@ def dashboard(
         if question.difficulty == "Hard"
     )
 
-    # --------------------------------------------------------
-    # PROGRESS PERCENTAGE
-    # --------------------------------------------------------
-
     if total_questions == 0:
 
         progress_percentage = 0
@@ -530,10 +529,6 @@ def dashboard(
             (solved_questions / total_questions) * 100
         )
 
-    # --------------------------------------------------------
-    # CATEGORIES
-    # --------------------------------------------------------
-
     categories = list(
         set(
             question.category
@@ -541,10 +536,6 @@ def dashboard(
             if question.category
         )
     )
-
-    # --------------------------------------------------------
-    # RECENT QUESTIONS
-    # --------------------------------------------------------
 
     recent_questions = (
         db.query(Question)
@@ -557,10 +548,6 @@ def dashboard(
         .limit(5)
         .all()
     )
-
-    # --------------------------------------------------------
-    # FINAL DASHBOARD RESPONSE
-    # --------------------------------------------------------
 
     return {
 
@@ -603,6 +590,7 @@ def dashboard(
             }
 
             for question in recent_questions
+
         ]
     }
 
@@ -618,17 +606,9 @@ def create_resume(
     user_id: str = Depends(get_current_user)
 ):
 
-    # --------------------------------------------------------
-    # CHECK EXISTING RESUME
-    # --------------------------------------------------------
-
     existing_resume = db.query(Resume).filter(
         Resume.user_id == int(user_id)
     ).first()
-
-    # --------------------------------------------------------
-    # UPDATE EXISTING RESUME
-    # --------------------------------------------------------
 
     if existing_resume:
 
@@ -638,16 +618,13 @@ def create_resume(
         existing_resume.skills = resume.skills
 
         db.commit()
+
         db.refresh(existing_resume)
 
         return {
             "message": "Resume updated successfully",
             "id": existing_resume.id
         }
-
-    # --------------------------------------------------------
-    # CREATE NEW RESUME
-    # --------------------------------------------------------
 
     new_resume = Resume(
         name=resume.name,
@@ -658,7 +635,9 @@ def create_resume(
     )
 
     db.add(new_resume)
+
     db.commit()
+
     db.refresh(new_resume)
 
     return {
@@ -682,6 +661,7 @@ def get_resume(
     ).first()
 
     if not resume:
+
         raise HTTPException(
             status_code=404,
             detail="Resume not found"
@@ -694,7 +674,9 @@ def get_resume(
         "college": resume.college,
         "skills": resume.skills
     }
-    # ============================================================
+
+
+# ============================================================
 # RESUME ATS ANALYZER
 # ============================================================
 
@@ -704,63 +686,50 @@ def analyze_resume(
     user_id: str = Depends(get_current_user)
 ):
 
-    # --------------------------------------------
-    # GET USER RESUME
-    # --------------------------------------------
-
     resume = db.query(Resume).filter(
         Resume.user_id == int(user_id)
     ).first()
 
     if not resume:
+
         raise HTTPException(
             status_code=404,
             detail="Resume not found"
         )
 
-    # --------------------------------------------
-    # INITIAL SCORE
-    # --------------------------------------------
-
     score = 0
+
     suggestions = []
 
-    # --------------------------------------------
-    # NAME
-    # --------------------------------------------
-
     if resume.name and resume.name.strip():
+
         score += 10
+
     else:
+
         suggestions.append(
             "Add your full name."
         )
 
-    # --------------------------------------------
-    # EMAIL
-    # --------------------------------------------
-
     if resume.email and resume.email.strip():
+
         score += 10
+
     else:
+
         suggestions.append(
             "Add a professional email address."
         )
 
-    # --------------------------------------------
-    # COLLEGE
-    # --------------------------------------------
-
     if resume.college and resume.college.strip():
+
         score += 15
+
     else:
+
         suggestions.append(
             "Add your college or university."
         )
-
-    # --------------------------------------------
-    # SKILLS
-    # --------------------------------------------
 
     if resume.skills and resume.skills.strip():
 
@@ -772,14 +741,16 @@ def analyze_resume(
             if skill.strip()
         ]
 
-        # Additional points based on number of skills
         if len(skills) >= 5:
+
             score += 20
 
         elif len(skills) >= 3:
+
             score += 10
 
         else:
+
             suggestions.append(
                 "Add more relevant technical skills."
             )
@@ -790,18 +761,12 @@ def analyze_resume(
             "Add technical skills such as Python, DSA, SQL, React, etc."
         )
 
-    # --------------------------------------------
-    # SCORE LIMIT
-    # --------------------------------------------
-
     if score > 100:
+
         score = 100
 
-    # --------------------------------------------
-    # GENERAL SUGGESTIONS
-    # --------------------------------------------
-
     if not suggestions:
+
         suggestions.append(
             "Your resume has good basic information."
         )
@@ -810,25 +775,21 @@ def analyze_resume(
             "Consider adding projects and certifications."
         )
 
-    # --------------------------------------------
-    # SCORE LEVEL
-    # --------------------------------------------
-
     if score >= 80:
+
         level = "Excellent"
 
     elif score >= 60:
+
         level = "Good"
 
     elif score >= 40:
+
         level = "Needs Improvement"
 
     else:
-        level = "Weak"
 
-    # --------------------------------------------
-    # RESPONSE
-    # --------------------------------------------
+        level = "Weak"
 
     return {
 
@@ -839,32 +800,9 @@ def analyze_resume(
         "suggestions": suggestions
 
     }
-    # ============================================================
-# COMPANY ROADMAP
+
+
 # ============================================================
-
-@app.get("/companies")
-def get_companies(
-    db: Session = Depends(get_db)
-):
-
-    companies = db.query(
-        CompanyRoadmap
-    ).all()
-
-    return [
-        {
-            "id": company.id,
-            "company_name": company.company_name,
-            "skills": company.skills,
-            "dsa_topics": company.dsa_topics,
-            "core_subjects": company.core_subjects,
-            "difficulty": company.difficulty,
-            "progress": company.progress
-        }
-        for company in companies
-    ]
-    # ============================================================
 # COMPANY ROADMAP - GET COMPANIES
 # ============================================================
 
@@ -878,17 +816,68 @@ def get_companies(
     ).all()
 
     return [
+
         {
             "id": company.id,
+
             "company_name": company.company_name,
+
             "skills": company.skills,
+
             "dsa_topics": company.dsa_topics,
+
             "core_subjects": company.core_subjects,
+
             "difficulty": company.difficulty,
+
             "progress": company.progress
         }
+
         for company in companies
+
     ]
+
+
+# ============================================================
+# COMPANY ROADMAP - GET SINGLE COMPANY
+# ============================================================
+
+@app.get("/companies/{company_id}")
+def get_company(
+    company_id: int,
+    db: Session = Depends(get_db)
+):
+
+    company = db.query(
+        CompanyRoadmap
+    ).filter(
+        CompanyRoadmap.id == company_id
+    ).first()
+
+    if not company:
+
+        raise HTTPException(
+            status_code=404,
+            detail="Company not found"
+        )
+
+    return {
+
+        "id": company.id,
+
+        "company_name": company.company_name,
+
+        "skills": company.skills,
+
+        "dsa_topics": company.dsa_topics,
+
+        "core_subjects": company.core_subjects,
+
+        "difficulty": company.difficulty,
+
+        "progress": company.progress
+
+    }
 
 
 # ============================================================
@@ -905,6 +894,7 @@ def seed_companies(
     ).count()
 
     if existing > 0:
+
         return {
             "message": "Companies already exist"
         }
@@ -973,4 +963,52 @@ def seed_companies(
     return {
         "message": "Company roadmap created successfully"
     }
-    
+
+
+# ============================================================
+# UPDATE COMPANY PREPARATION PROGRESS
+# ============================================================
+
+@app.put("/companies/{company_id}/progress")
+def update_company_progress(
+    company_id: int,
+    progress: int,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_current_user)
+):
+
+    company = db.query(
+        CompanyRoadmap
+    ).filter(
+        CompanyRoadmap.id == company_id
+    ).first()
+
+    if not company:
+
+        raise HTTPException(
+            status_code=404,
+            detail="Company not found"
+        )
+
+    if progress < 0 or progress > 100:
+
+        raise HTTPException(
+            status_code=400,
+            detail="Progress must be between 0 and 100"
+        )
+
+    company.progress = progress
+
+    db.commit()
+
+    db.refresh(company)
+
+    return {
+
+        "message": "Progress updated successfully",
+
+        "company_id": company.id,
+
+        "progress": company.progress
+
+    }
