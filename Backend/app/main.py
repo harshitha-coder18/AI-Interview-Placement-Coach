@@ -1012,3 +1012,94 @@ def update_company_progress(
         "progress": company.progress
 
     }
+    # ============================================================
+# GET SINGLE COMPANY
+# ============================================================
+
+@app.get("/companies/{company_id}")
+def get_company(
+    company_id: int,
+    db: Session = Depends(get_db)
+):
+
+    company = db.query(
+        CompanyRoadmap
+    ).filter(
+        CompanyRoadmap.id == company_id
+    ).first()
+
+    if not company:
+
+        raise HTTPException(
+            status_code=404,
+            detail="Company not found"
+        )
+
+    return {
+
+        "id": company.id,
+
+        "company_name":
+            company.company_name,
+
+        "skills":
+            company.skills,
+
+        "dsa_topics":
+            company.dsa_topics,
+
+        "core_subjects":
+            company.core_subjects,
+
+        "difficulty":
+            company.difficulty,
+
+        "progress":
+            company.progress or 0
+    }
+    # ============================================================
+# UPDATE COMPANY PROGRESS
+# ============================================================
+
+@app.put("/companies/{company_id}/progress")
+def update_company_progress(
+    company_id: int,
+    progress: int,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_current_user)
+):
+
+    company = db.query(
+        CompanyRoadmap
+    ).filter(
+        CompanyRoadmap.id == company_id
+    ).first()
+
+    if not company:
+
+        raise HTTPException(
+            status_code=404,
+            detail="Company not found"
+        )
+
+    if progress < 0 or progress > 100:
+
+        raise HTTPException(
+            status_code=400,
+            detail="Progress must be between 0 and 100"
+        )
+
+    company.progress = progress
+
+    db.commit()
+
+    db.refresh(company)
+
+    return {
+
+        "message":
+            "Progress updated successfully",
+
+        "progress":
+            company.progress
+    }
